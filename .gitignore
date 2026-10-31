@@ -1,7 +1,19 @@
+# Python
 venv/
+.venv/
 __pycache__/
-*.pyc
+*.py[cod]
+
+# Flask
 instance/
-suman_store.db
-serviceAccountKey.json
+
+# Database
+*.db
+
+# Private credentials
 .env
+serviceAccountKey.json
+
+# IDE
+.vscode/
+.idea/
