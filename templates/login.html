@@ -1,253 +1,562 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Login - Suman Store</title>
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #101828, #243b55);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 25px 12px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background: white;
+            padding: 30px;
+            border-radius: 18px;
+            box-shadow: 0 15px 40px rgba(0,0,0,.3);
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #2563eb;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #777;
+            margin-bottom: 25px;
+        }
+
+        h2 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #222;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-top: 14px;
+            margin-bottom: 7px;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ddd;
+            border-radius: 9px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #2563eb;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 9px;
+            background: #2563eb;
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            opacity: .9;
+        }
+
+        button:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        .google-btn {
+            background: #222;
+        }
+
+        .phone-btn {
+            background: #059669;
+        }
+
+        .divider {
+            text-align: center;
+            color: #888;
+            margin: 23px 0;
+        }
+
+        .section {
+            border-top: 1px solid #eee;
+            margin-top: 23px;
+            padding-top: 22px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .message {
+            display: none;
+            padding: 11px;
+            border-radius: 8px;
+            margin-bottom: 13px;
+            font-size: 14px;
+        }
+
+        .success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 23px;
+            color: #666;
+        }
+
+        .footer a {
+            color: #2563eb;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        @media(max-width:480px) {
+            .container {
+                padding: 23px 18px;
+            }
+        }
+    </style>
 
 </head>
 
 <body>
 
-<div class="auth-container">
+<div class="container">
 
-    <h1>Welcome Back!</h1>
-    <p>Login to Suman Store</p>
+    <div class="logo">Suman Store</div>
 
-    {% with messages = get_flashed_messages() %}
-        {% for message in messages %}
-            <p>{{ message }}</p>
-        {% endfor %}
-    {% endwith %}
+    <p class="subtitle">Welcome back! Login to continue.</p>
 
-    <hr>
+    <div id="message" class="message"></div>
 
-    <!-- Email Login -->
-    <h3>Email Login</h3>
 
-    <form method="POST">
+    <!-- EMAIL PASSWORD LOGIN -->
 
-        <input type="email"
-               name="email"
-               placeholder="Email Address"
-               required>
+    <h2>Email & Password Login</h2>
 
-        <input type="password"
-               name="password"
-               placeholder="Password"
-               required>
+    <form method="POST" action="{{ url_for('login') }}">
 
-        <button type="submit">Login with Email</button>
+        <label>Email Address</label>
+
+        <input
+            type="email"
+            name="email"
+            id="passwordEmail"
+            placeholder="Enter your email"
+            required
+        >
+
+        <label>Password</label>
+
+        <input
+            type="password"
+            name="password"
+            placeholder="Enter your password"
+            required
+        >
+
+        <button type="submit">
+            Login
+        </button>
 
     </form>
 
-    <hr>
 
-    <!-- Phone OTP Login -->
-    <h3>Phone Number Login</h3>
+    <!-- EMAIL OTP LOGIN -->
 
-    <input type="tel"
-           id="phoneNumber"
-           placeholder="+91XXXXXXXXXX">
+    <div class="section">
 
-    <div id="recaptcha-container"></div>
+        <h2>Login with Email OTP</h2>
 
-    <button type="button" onclick="sendOTP()">
-        Send OTP
-    </button>
+        <label>Email Address</label>
 
-    <br><br>
+        <input
+            type="email"
+            id="otpEmail"
+            placeholder="Enter your registered email"
+        >
 
-    <div id="otpSection" style="display:none;">
-
-        <input type="text"
-               id="otpCode"
-               placeholder="Enter 6 Digit OTP"
-               maxlength="6">
-
-        <button type="button" onclick="verifyOTP()">
-            Verify OTP
+        <button
+            type="button"
+            id="sendOtpBtn"
+            onclick="sendLoginOTP()"
+        >
+            Send Login OTP
         </button>
+
+
+        <div id="otpSection" class="hidden">
+
+            <label>Enter 6 Digit OTP</label>
+
+            <input
+                type="text"
+                id="emailOtp"
+                placeholder="Enter OTP"
+                maxlength="6"
+                inputmode="numeric"
+            >
+
+            <button
+                type="button"
+                id="verifyOtpBtn"
+                onclick="verifyLoginOTP()"
+            >
+                Verify OTP & Login
+            </button>
+
+            <button
+                type="button"
+                id="resendOtpBtn"
+                style="background:#64748b;"
+                onclick="resendLoginOTP()"
+            >
+                Resend OTP
+            </button>
+
+        </div>
 
     </div>
 
-    <hr>
 
-    <!-- Google Login -->
-    <h3>Google Login</h3>
+    <div class="divider">OR LOGIN WITH</div>
 
-    <button type="button" onclick="googleLogin()">
+
+    <!-- GOOGLE LOGIN -->
+
+    <button
+        type="button"
+        class="google-btn"
+        onclick="googleLogin()"
+    >
         Continue with Google
     </button>
 
-    <p id="authMessage"></p>
 
-    <hr>
+    <!-- PHONE LOGIN -->
 
-    <p>
+    <div class="section">
+
+        <h2>Phone OTP Login</h2>
+
+        <label>Phone Number</label>
+
+        <input
+            type="tel"
+            id="phoneNumber"
+            placeholder="+919876543210"
+        >
+
+        <div id="recaptcha-container"></div>
+
+        <button
+            type="button"
+            class="phone-btn"
+            onclick="sendPhoneOTP()"
+        >
+            Send Phone OTP
+        </button>
+
+        <div id="phoneOtpSection" class="hidden">
+
+            <label>Enter OTP</label>
+
+            <input
+                type="text"
+                id="phoneOtp"
+                placeholder="Enter 6 digit OTP"
+                maxlength="6"
+                inputmode="numeric"
+            >
+
+            <button
+                type="button"
+                class="phone-btn"
+                onclick="verifyPhoneOTP()"
+            >
+                Verify & Login
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div class="footer">
+
         Don't have an account?
-        <a href="{{ url_for('register') }}">Create Account</a>
-    </p>
 
-    <a href="/">Back to Home</a>
+        <a href="{{ url_for('register') }}">
+            Create Account
+        </a>
+
+    </div>
 
 </div>
 
 
+<!-- FIREBASE SDK -->
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+
+
 <script>
 
-    // Firebase Configuration
+    // FIREBASE CONFIGURATION
 
     const firebaseConfig = {
+
         apiKey: "AIzaSyBBE1ybzyremvPC49NJxxaPgNZtXvc7SzM",
+
         authDomain: "sumanstore-f1532.firebaseapp.com",
+
         projectId: "sumanstore-f1532",
+
         storageBucket: "sumanstore-f1532.firebasestorage.app",
+
         messagingSenderId: "77879461120",
+
         appId: "1:77879461120:web:a511144bc439520f8b9fe5",
+
         measurementId: "G-P9HS42KQPL"
+
     };
 
     firebase.initializeApp(firebaseConfig);
 
     const auth = firebase.auth();
 
-    let confirmationResult;
 
-    const message = document.getElementById("authMessage");
+    // MESSAGE
+
+    function showMessage(message, type = "error") {
+
+        const box = document.getElementById("message");
+
+        box.innerText = message;
+
+        box.className = "message " + type;
+
+        box.style.display = "block";
+
+    }
 
 
-    // Backend Login
+    // EMAIL OTP LOGIN
 
-    async function backendLogin(user) {
+    async function sendLoginOTP() {
+
+        const email = document.getElementById("otpEmail").value.trim();
+
+        if (!email) {
+
+            showMessage("Please enter your email.");
+
+            return;
+
+        }
+
+        const button = document.getElementById("sendOtpBtn");
+
+        button.disabled = true;
+
+        button.innerText = "Sending OTP...";
 
         try {
 
-            const idToken = await user.getIdToken();
+            const response = await fetch(
+                "{{ url_for('send_login_otp') }}",
+                {
+                    method: "POST",
 
-            const response = await fetch("/firebase-login", {
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
 
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify({
-                    idToken: idToken
-                })
-
-            });
+                    body: JSON.stringify({
+                        email: email
+                    })
+                }
+            );
 
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.message || "Backend login failed");
+
+                throw new Error(data.message);
+
             }
 
-            message.innerText = "Login successful!";
+            document.getElementById("otpSection")
+                .classList.remove("hidden");
 
-            window.location.href = data.redirect || "/";
+            showMessage(data.message, "success");
 
-        } catch (error) {
+        } catch(error) {
 
-            message.innerText = error.message;
+            showMessage(error.message);
+
+        } finally {
+
+            button.disabled = false;
+
+            button.innerText = "Send Login OTP";
 
         }
 
     }
 
 
-    // Send OTP
+    // VERIFY EMAIL OTP
 
-    async function sendOTP() {
+    async function verifyLoginOTP() {
+
+        const email = document.getElementById("otpEmail").value.trim();
+
+        const otp = document.getElementById("emailOtp").value.trim();
+
+        if (!/^\d{6}$/.test(otp)) {
+
+            showMessage("Enter valid 6 digit OTP.");
+
+            return;
+
+        }
+
+        const button = document.getElementById("verifyOtpBtn");
+
+        button.disabled = true;
+
+        button.innerText = "Verifying...";
 
         try {
 
-            const phone = document.getElementById("phoneNumber").value.trim();
+            const response = await fetch(
+                "{{ url_for('verify_login_otp') }}",
+                {
+                    method: "POST",
 
-            if (!/^\+[1-9]\d{7,14}$/.test(phone)) {
-                message.innerText = "Enter phone number with country code, e.g. +91XXXXXXXXXX";
-                return;
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        email: email,
+                        otp: otp
+                    })
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+
+                throw new Error(data.message);
+
             }
 
-            message.innerText = "Sending OTP...";
+            showMessage(data.message, "success");
 
-            if (!window.recaptchaVerifier) {
+            window.location.href = data.redirect;
 
-                window.recaptchaVerifier =
-                    new firebase.auth.RecaptchaVerifier(
-                        "recaptcha-container",
-                        {
-                            size: "normal"
-                        }
-                    );
+        } catch(error) {
 
-            }
+            showMessage(error.message);
 
-            await window.recaptchaVerifier.render();
+        } finally {
 
-            confirmationResult =
-                await auth.signInWithPhoneNumber(
-                    phone,
-                    window.recaptchaVerifier
-                );
+            button.disabled = false;
 
-            document.getElementById("otpSection").style.display = "block";
-
-            message.innerText = "OTP sent successfully!";
-
-        } catch (error) {
-
-            message.innerText = error.message;
-
-            if (window.recaptchaVerifier) {
-                window.recaptchaVerifier.clear();
-                window.recaptchaVerifier = null;
-            }
+            button.innerText = "Verify OTP & Login";
 
         }
 
     }
 
 
-    // Verify OTP
+    // RESEND LOGIN OTP
 
-    async function verifyOTP() {
+    async function resendLoginOTP() {
+
+        const button = document.getElementById("resendOtpBtn");
+
+        button.disabled = true;
 
         try {
 
-            const otp = document.getElementById("otpCode").value.trim();
+            const response = await fetch(
+                "{{ url_for('resend_login_otp') }}",
+                {
+                    method: "POST"
+                }
+            );
 
-            if (!/^\d{6}$/.test(otp)) {
-                message.innerText = "Enter a valid 6 digit OTP.";
-                return;
+            const data = await response.json();
+
+            if (!response.ok) {
+
+                throw new Error(data.message);
+
             }
 
-            message.innerText = "Verifying OTP...";
+            showMessage(data.message, "success");
 
-            const result = await confirmationResult.confirm(otp);
+        } catch(error) {
 
-            await backendLogin(result.user);
+            showMessage(error.message);
 
-        } catch (error) {
+        } finally {
 
-            message.innerText = error.message;
+            button.disabled = false;
 
         }
 
     }
 
 
-    // Google Login
+    // GOOGLE LOGIN
 
     async function googleLogin() {
 
@@ -259,9 +568,160 @@
 
             await backendLogin(result.user);
 
-        } catch (error) {
+        } catch(error) {
 
-            message.innerText = error.message;
+            showMessage(error.message);
+
+        }
+
+    }
+
+
+    // PHONE OTP
+
+    let confirmationResult = null;
+
+    let recaptchaVerifier = null;
+
+
+    async function setupRecaptcha() {
+
+        if (recaptchaVerifier) {
+
+            return;
+
+        }
+
+        recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
+            "recaptcha-container",
+            {
+                size: "normal"
+            }
+        );
+
+        await recaptchaVerifier.render();
+
+    }
+
+
+    async function sendPhoneOTP() {
+
+        const phone = document.getElementById("phoneNumber").value.trim();
+
+        if (!/^\+[1-9]\d{7,14}$/.test(phone)) {
+
+            showMessage("Enter phone number with country code. Example: +919876543210");
+
+            return;
+
+        }
+
+        try {
+
+            await setupRecaptcha();
+
+            confirmationResult = await auth.signInWithPhoneNumber(
+                phone,
+                recaptchaVerifier
+            );
+
+            document.getElementById("phoneOtpSection")
+                .classList.remove("hidden");
+
+            showMessage("Phone OTP sent successfully!", "success");
+
+        } catch(error) {
+
+            showMessage(error.message);
+
+            if (recaptchaVerifier) {
+
+                recaptchaVerifier.clear();
+
+                recaptchaVerifier = null;
+
+            }
+
+        }
+
+    }
+
+
+    // VERIFY PHONE OTP
+
+    async function verifyPhoneOTP() {
+
+        const otp = document.getElementById("phoneOtp").value.trim();
+
+        if (!confirmationResult) {
+
+            showMessage("Please send OTP first.");
+
+            return;
+
+        }
+
+        if (!/^\d{6}$/.test(otp)) {
+
+            showMessage("Enter valid 6 digit OTP.");
+
+            return;
+
+        }
+
+        try {
+
+            const result = await confirmationResult.confirm(otp);
+
+            await backendLogin(result.user);
+
+        } catch(error) {
+
+            showMessage(error.message);
+
+        }
+
+    }
+
+
+    // FIREBASE BACKEND LOGIN
+
+    async function backendLogin(user) {
+
+        try {
+
+            const idToken = await user.getIdToken();
+
+            const response = await fetch(
+                "{{ url_for('firebase_login') }}",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        idToken: idToken
+                    })
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+
+                throw new Error(data.message);
+
+            }
+
+            showMessage(data.message, "success");
+
+            window.location.href = data.redirect;
+
+        } catch(error) {
+
+            showMessage(error.message);
 
         }
 
