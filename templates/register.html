@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Register - Suman Store</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+
+</head>
+
+<body>
+
+<div class="auth-container">
+
+    <h1>Join Suman Store</h1>
+    <p>Create Your Account</p>
+
+    {% with messages = get_flashed_messages() %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endwith %}
+
+    <hr>
+
+    <!-- ACCOUNT DETAILS -->
+
+    <h3>Account Details</h3>
+
+    <input type="text"
+           id="name"
+           placeholder="Full Name"
+           required>
+
+    <label>Select Account Type</label>
+
+    <select id="role">
+        <option value="customer">Customer</option>
+        <option value="seller">Seller</option>
+    </select>
+
+    <hr>
+
+    <!-- PHONE REGISTRATION -->
+
+    <h3>Register with Phone OTP</h3>
+
+    <input type="tel"
+           id="phoneNumber"
+           placeholder="+91XXXXXXXXXX">
+
+    <div id="recaptcha-container"></div>
+
+    <button type="button" onclick="sendOTP()">
+        Send OTP
+    </button>
+
+    <br><br>
+
+    <div id="otpSection" style="display:none;">
+
+        <input type="text"
+               id="otpCode"
+               placeholder="Enter 6 Digit OTP"
+               maxlength="6">
+
+        <button type="button" onclick="verifyOTP()">
+            Verify & Create Account
+        </button>
+
+    </div>
+
+    <hr>
+
+    <!-- GOOGLE REGISTRATION -->
+
+    <h3>Register with Google</h3>
+
+    <button type="button" onclick="googleRegister()">
+        Continue with Google
+    </button>
+
+    <p id="authMessage"></p>
+
+    <hr>
+
+    <!-- EMAIL REGISTRATION -->
+
+    <h3>Register with Email</h3>
+
+    <form method="POST">
+
+        <input type="text"
+               name="name"
+               placeholder="Full Name"
+               required>
+
+        <input type="email"
+               name="email"
+               placeholder="Email Address"
+               required>
+
+        <input type="password"
+               name="password"
+               placeholder="Password (minimum 8 characters)"
+               minlength="8"
+               required>
+
+        <label>Select Account Type</label>
+
+        <select name="role" required>
+            <option value="customer">Customer</option>
+            <option value="seller">Seller</option>
+        </select>
+
+        <button type="submit">
+            Create Account with Email
+        </button>
+
+    </form>
+
+    <p>
+        Already have an account?
+        <a href="{{ url_for('login') }}">Login</a>
+    </p>
+
+    <a href="/">Back to Home</a>
+
+</div>
+
+
+<script>
+
+    // FIREBASE CONFIGURATION
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBBE1ybzyremvPC49NJxxaPgNZtXvc7SzM",
+        authDomain: "sumanstore-f1532.firebaseapp.com",
+        projectId: "sumanstore-f1532",
+        storageBucket: "sumanstore-f1532.firebasestorage.app",
+        messagingSenderId: "77879461120",
+        appId: "1:77879461120:web:a511144bc439520f8b9fe5",
+        measurementId: "G-P9HS42KQPL"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+
+    const auth = firebase.auth();
+
+    let confirmationResult = null;
+
+    const message = document.getElementById("authMessage");
+
+
+    // BACKEND REGISTRATION
+
+    async function backendRegister(user) {
+
+        try {
+
+            const name = document.getElementById("name").value.trim();
+
+            const role = document.getElementById("role").value;
+
+            if (!name) {
+                message.innerText = "Please enter your full name.";
+                return;
+            }
+
+            const idToken = await user.getIdToken();
+
+            message.innerText = "Creating your account...";
+
+            const response = await fetch("/firebase-register", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    idToken: idToken,
+                    name: name,
+                    role: role
+                })
+
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Registration failed");
+            }
+
+            message.innerText = "Account created successfully!";
+
+            window.location.href = data.redirect || "/dashboard";
+
+        } catch (error) {
+
+            message.innerText = error.message;
+
+        }
+
+    }
+
+
+    // SEND OTP
+
+    async function sendOTP() {
+
+        try {
+
+            const phone = document.getElementById("phoneNumber").value.trim();
+
+            if (!/^\+[1-9]\d{7,14}$/.test(phone)) {
+
+                message.innerText =
+                    "Enter phone number with country code, e.g. +91XXXXXXXXXX";
+
+                return;
+            }
+
+            message.innerText = "Sending OTP...";
+
+            if (!window.recaptchaVerifier) {
+
+                window.recaptchaVerifier =
+                    new firebase.auth.RecaptchaVerifier(
+                        "recaptcha-container",
+                        {
+                            size: "normal"
+                        }
+                    );
+
+            }
+
+            await window.recaptchaVerifier.render();
+
+            confirmationResult =
+                await auth.signInWithPhoneNumber(
+                    phone,
+                    window.recaptchaVerifier
+                );
+
+            document.getElementById("otpSection").style.display = "block";
+
+            message.innerText = "OTP sent successfully!";
+
+        } catch (error) {
+
+            message.innerText = error.message;
+
+            if (window.recaptchaVerifier) {
+
+                window.recaptchaVerifier.clear();
+
+                window.recaptchaVerifier = null;
+
+            }
+
+        }
+
+    }
+
+
+    // VERIFY OTP AND REGISTER
+
+    async function verifyOTP() {
+
+        try {
+
+            if (!confirmationResult) {
+
+                message.innerText = "Please send OTP first.";
+
+                return;
+            }
+
+            const otp = document.getElementById("otpCode").value.trim();
+
+            if (!/^\d{6}$/.test(otp)) {
+
+                message.innerText = "Enter valid 6 digit OTP.";
+
+                return;
+            }
+
+            message.innerText = "Verifying OTP...";
+
+            const result = await confirmationResult.confirm(otp);
+
+            await backendRegister(result.user);
+
+        } catch (error) {
+
+            message.innerText = error.message;
+
+        }
+
+    }
+
+
+    // GOOGLE REGISTRATION
+
+    async function googleRegister() {
+
+        try {
+
+            const provider = new firebase.auth.GoogleAuthProvider();
+
+            message.innerText = "Opening Google Login...";
+
+            const result = await auth.signInWithPopup(provider);
+
+            await backendRegister(result.user);
+
+        } catch (error) {
+
+            message.innerText = error.message;
+
+        }
+
+    }
+
+</script>
+
+</body>
+</html>

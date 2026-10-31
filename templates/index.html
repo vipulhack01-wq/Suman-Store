@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Suman Store</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <div class="logo">Suman Store</div>
+
+    <nav>
+        <a href="/">Home</a>
+        <a href="#products">Products</a>
+        <a href="#categories">Categories</a>
+    </nav>
+
+    <div class="user-menu">
+
+        {% if current_user.is_authenticated %}
+
+            <a href="{{ url_for('dashboard') }}">
+                <button>My Account</button>
+            </a>
+
+            {% if current_user.role == 'customer' %}
+                <a href="{{ url_for('cart') }}">
+                    <button>🛒 My Cart</button>
+                </a>
+            {% endif %}
+
+            <a href="{{ url_for('logout') }}">
+                <button>Logout</button>
+            </a>
+
+        {% else %}
+
+            <a href="{{ url_for('login') }}">
+                <button>Login</button>
+            </a>
+
+            <a href="{{ url_for('register') }}">
+                <button>Register</button>
+            </a>
+
+        {% endif %}
+
+    </div>
+
+</header>
+
+
+<section class="hero">
+
+    <h1>Welcome to Suman Store</h1>
+
+    <p>Discover Amazing Products at Best Prices</p>
+
+    <a href="#products">
+        <button>Shop Now</button>
+    </a>
+
+</section>
+
+
+<section id="categories">
+
+    <h2>Shop By Categories</h2>
+
+</section>
+
+
+<section id="products">
+
+    <h2>Our Products</h2>
+
+    <div class="product-container">
+
+        {% if products %}
+
+            {% for product in products %}
+
+                <div class="product-card">
+
+                    {% if product.image %}
+
+                        <img
+                            src="{{ url_for('static', filename='uploads/' + product.image) }}"
+                            alt="{{ product.name }}"
+                        >
+
+                    {% else %}
+
+                        <img
+                            src="https://placehold.co/300x220?text=No+Image"
+                            alt="No Image"
+                        >
+
+                    {% endif %}
+
+                    <h3>{{ product.name }}</h3>
+
+                    <p>{{ product.description }}</p>
+
+                    <h3>₹{{ "%.2f"|format(product.price) }}</h3>
+
+                    <p>Available Stock: {{ product.stock }}</p>
+
+                    {% if current_user.is_authenticated
+                          and current_user.role == 'customer' %}
+
+                        <form method="POST"
+                              action="{{ url_for('add_to_cart', product_id=product.id) }}">
+
+                            <button type="submit">
+                                🛒 Add to Cart
+                            </button>
+
+                        </form>
+
+                    {% elif not current_user.is_authenticated %}
+
+                        <a href="{{ url_for('login') }}">
+                            <button>Login to Buy</button>
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <h3>No Products Available Yet!</h3>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+
+<footer>
+
+    <p>© 2026 Suman Store. All Rights Reserved.</p>
+
+</footer>
+
+</body>
+</html>

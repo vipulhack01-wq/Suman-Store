@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login - Suman Store</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+
+</head>
+
+<body>
+
+<div class="auth-container">
+
+    <h1>Welcome Back!</h1>
+    <p>Login to Suman Store</p>
+
+    {% with messages = get_flashed_messages() %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endwith %}
+
+    <hr>
+
+    <!-- Email Login -->
+    <h3>Email Login</h3>
+
+    <form method="POST">
+
+        <input type="email"
+               name="email"
+               placeholder="Email Address"
+               required>
+
+        <input type="password"
+               name="password"
+               placeholder="Password"
+               required>
+
+        <button type="submit">Login with Email</button>
+
+    </form>
+
+    <hr>
+
+    <!-- Phone OTP Login -->
+    <h3>Phone Number Login</h3>
+
+    <input type="tel"
+           id="phoneNumber"
+           placeholder="+91XXXXXXXXXX">
+
+    <div id="recaptcha-container"></div>
+
+    <button type="button" onclick="sendOTP()">
+        Send OTP
+    </button>
+
+    <br><br>
+
+    <div id="otpSection" style="display:none;">
+
+        <input type="text"
+               id="otpCode"
+               placeholder="Enter 6 Digit OTP"
+               maxlength="6">
+
+        <button type="button" onclick="verifyOTP()">
+            Verify OTP
+        </button>
+
+    </div>
+
+    <hr>
+
+    <!-- Google Login -->
+    <h3>Google Login</h3>
+
+    <button type="button" onclick="googleLogin()">
+        Continue with Google
+    </button>
+
+    <p id="authMessage"></p>
+
+    <hr>
+
+    <p>
+        Don't have an account?
+        <a href="{{ url_for('register') }}">Create Account</a>
+    </p>
+
+    <a href="/">Back to Home</a>
+
+</div>
+
+
+<script>
+
+    // Firebase Configuration
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBBE1ybzyremvPC49NJxxaPgNZtXvc7SzM",
+        authDomain: "sumanstore-f1532.firebaseapp.com",
+        projectId: "sumanstore-f1532",
+        storageBucket: "sumanstore-f1532.firebasestorage.app",
+        messagingSenderId: "77879461120",
+        appId: "1:77879461120:web:a511144bc439520f8b9fe5",
+        measurementId: "G-P9HS42KQPL"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+
+    const auth = firebase.auth();
+
+    let confirmationResult;
+
+    const message = document.getElementById("authMessage");
+
+
+    // Backend Login
+
+    async function backendLogin(user) {
+
+        try {
+
+            const idToken = await user.getIdToken();
+
+            const response = await fetch("/firebase-login", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    idToken: idToken
+                })
+
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Backend login failed");
+            }
+
+            message.innerText = "Login successful!";
+
+            window.location.href = data.redirect || "/";
+
+        } catch (error) {
+
+            message.innerText = error.message;
+
+        }
+
+    }
+
+
+    // Send OTP
+
+    async function sendOTP() {
+
+        try {
+
+            const phone = document.getElementById("phoneNumber").value.trim();
+
+            if (!/^\+[1-9]\d{7,14}$/.test(phone)) {
+                message.innerText = "Enter phone number with country code, e.g. +91XXXXXXXXXX";
+                return;
+            }
+
+            message.innerText = "Sending OTP...";
+
+            if (!window.recaptchaVerifier) {
+
+                window.recaptchaVerifier =
+                    new firebase.auth.RecaptchaVerifier(
+                        "recaptcha-container",
+                        {
+                            size: "normal"
+                        }
+                    );
+
+            }
+
+            await window.recaptchaVerifier.render();
+
+            confirmationResult =
+                await auth.signInWithPhoneNumber(
+                    phone,
+                    window.recaptchaVerifier
+                );
+
+            document.getElementById("otpSection").style.display = "block";
+
+            message.innerText = "OTP sent successfully!";
+
+        } catch (error) {
+
+            message.innerText = error.message;
+
+            if (window.recaptchaVerifier) {
+                window.recaptchaVerifier.clear();
+                window.recaptchaVerifier = null;
+            }
+
+        }
+
+    }
+
+
+    // Verify OTP
+
+    async function verifyOTP() {
+
+        try {
+
+            const otp = document.getElementById("otpCode").value.trim();
+
+            if (!/^\d{6}$/.test(otp)) {
+                message.innerText = "Enter a valid 6 digit OTP.";
+                return;
+            }
+
+            message.innerText = "Verifying OTP...";
+
+            const result = await confirmationResult.confirm(otp);
+
+            await backendLogin(result.user);
+
+        } catch (error) {
+
+            message.innerText = error.message;
+
+        }
+
+    }
+
+
+    // Google Login
+
+    async function googleLogin() {
+
+        try {
+
+            const provider = new firebase.auth.GoogleAuthProvider();
+
+            const result = await auth.signInWithPopup(provider);
+
+            await backendLogin(result.user);
+
+        } catch (error) {
+
+            message.innerText = error.message;
+
+        }
+
+    }
+
+</script>
+
+</body>
+</html>

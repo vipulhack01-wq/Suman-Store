@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Suman Store</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    <div class="auth-container">
+
+        <h1>Admin Dashboard</h1>
+
+        <p>Welcome to Suman Store Admin Panel!</p>
+
+        <h2>Pending Products</h2>
+
+        {% if products %}
+
+            {% for product in products %}
+
+                <div class="product-card">
+
+                    <h3>{{ product.name }}</h3>
+
+                    <p>{{ product.description }}</p>
+
+                    <p>Price: ₹{{ product.price }}</p>
+
+                    <p>Stock: {{ product.stock }}</p>
+
+                    <form method="POST"
+                          action="{{ url_for('approve_product', product_id=product.id) }}">
+
+                        <button type="submit">Approve</button>
+
+                    </form>
+
+                    <form method="POST"
+                          action="{{ url_for('reject_product', product_id=product.id) }}">
+
+                        <button type="submit">Reject</button>
+
+                    </form>
+
+                </div>
+
+                <br>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p>No pending products available.</p>
+
+        {% endif %}
+
+        <br>
+
+        <a href="/">Visit Store</a>
+
+        <br><br>
+
+        <a href="{{ url_for('logout') }}">Logout</a>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product - Suman Store</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <div class="auth-container">
+
+        <h1>Add New Product</h1>
+        <p>List your product on Suman Store</p>
+
+        <form method="POST" enctype="multipart/form-data">
+
+            <input type="text" name="name"
+                   placeholder="Product Name" required>
+
+            <textarea name="description"
+                      placeholder="Product Description"
+                      required></textarea>
+
+            <input type="number" name="price"
+                   placeholder="Product Price (₹)"
+                   min="1" step="0.01" required>
+
+            <input type="number" name="stock"
+                   placeholder="Available Stock"
+                   min="0" required>
+
+            <input type="file" name="image"
+                   accept="image/png,image/jpeg,image/webp">
+
+            <button type="submit">Submit Product</button>
+
+        </form>
+
+        <br>
+        <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+
+    </div>
+
+</body>
+</html>

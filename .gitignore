@@ -1,0 +1,7 @@
+venv/
+__pycache__/
+*.pyc
+instance/
+suman_store.db
+serviceAccountKey.json
+.env
