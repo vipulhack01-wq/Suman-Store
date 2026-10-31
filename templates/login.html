@@ -156,7 +156,6 @@
             }
         }
     </style>
-
 </head>
 
 <body>
@@ -165,10 +164,11 @@
 
     <div class="logo">Suman Store</div>
 
-    <p class="subtitle">Welcome back! Login to continue.</p>
+    <p class="subtitle">
+        Welcome back! Login to continue.
+    </p>
 
     <div id="message" class="message"></div>
-
 
     <!-- EMAIL PASSWORD LOGIN -->
 
@@ -181,7 +181,6 @@
         <input
             type="email"
             name="email"
-            id="passwordEmail"
             placeholder="Enter your email"
             required
         >
@@ -224,7 +223,6 @@
             Send Login OTP
         </button>
 
-
         <div id="otpSection" class="hidden">
 
             <label>Enter 6 Digit OTP</label>
@@ -259,7 +257,9 @@
     </div>
 
 
-    <div class="divider">OR LOGIN WITH</div>
+    <div class="divider">
+        OR LOGIN WITH
+    </div>
 
 
     <!-- GOOGLE LOGIN -->
@@ -292,6 +292,7 @@
         <button
             type="button"
             class="phone-btn"
+            id="sendPhoneBtn"
             onclick="sendPhoneOTP()"
         >
             Send Phone OTP
@@ -364,12 +365,17 @@
 
     };
 
-    firebase.initializeApp(firebaseConfig);
+
+    // INITIALIZE FIREBASE
+
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
 
     const auth = firebase.auth();
 
 
-    // MESSAGE
+    // MESSAGE FUNCTION
 
     function showMessage(message, type = "error") {
 
@@ -380,6 +386,33 @@
         box.className = "message " + type;
 
         box.style.display = "block";
+
+    }
+
+
+    // SAFE JSON RESPONSE
+
+    async function getResponse(response) {
+
+        let data;
+
+        try {
+
+            data = await response.json();
+
+        } catch (error) {
+
+            throw new Error("Server returned an invalid response.");
+
+        }
+
+        if (!response.ok) {
+
+            throw new Error(data.message || "Something went wrong.");
+
+        }
+
+        return data;
 
     }
 
@@ -421,18 +454,15 @@
                 }
             );
 
-            const data = await response.json();
-
-            if (!response.ok) {
-
-                throw new Error(data.message);
-
-            }
+            const data = await getResponse(response);
 
             document.getElementById("otpSection")
                 .classList.remove("hidden");
 
-            showMessage(data.message, "success");
+            showMessage(
+                data.message || "OTP sent successfully.",
+                "success"
+            );
 
         } catch(error) {
 
@@ -489,17 +519,18 @@
                 }
             );
 
-            const data = await response.json();
+            const data = await getResponse(response);
 
-            if (!response.ok) {
+            showMessage(
+                data.message || "Login successful.",
+                "success"
+            );
 
-                throw new Error(data.message);
+            if (data.redirect) {
+
+                window.location.href = data.redirect;
 
             }
-
-            showMessage(data.message, "success");
-
-            window.location.href = data.redirect;
 
         } catch(error) {
 
@@ -516,13 +547,15 @@
     }
 
 
-    // RESEND LOGIN OTP
+    // RESEND EMAIL OTP
 
     async function resendLoginOTP() {
 
         const button = document.getElementById("resendOtpBtn");
 
         button.disabled = true;
+
+        button.innerText = "Sending...";
 
         try {
 
@@ -533,15 +566,12 @@
                 }
             );
 
-            const data = await response.json();
+            const data = await getResponse(response);
 
-            if (!response.ok) {
-
-                throw new Error(data.message);
-
-            }
-
-            showMessage(data.message, "success");
+            showMessage(
+                data.message || "OTP resent successfully.",
+                "success"
+            );
 
         } catch(error) {
 
@@ -550,6 +580,8 @@
         } finally {
 
             button.disabled = false;
+
+            button.innerText = "Resend OTP";
 
         }
 
@@ -584,12 +616,12 @@
     let recaptchaVerifier = null;
 
 
+    // SETUP RECAPTCHA
+
     async function setupRecaptcha() {
 
         if (recaptchaVerifier) {
-
             return;
-
         }
 
         recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
@@ -604,17 +636,27 @@
     }
 
 
+    // SEND PHONE OTP
+
     async function sendPhoneOTP() {
 
         const phone = document.getElementById("phoneNumber").value.trim();
 
         if (!/^\+[1-9]\d{7,14}$/.test(phone)) {
 
-            showMessage("Enter phone number with country code. Example: +919876543210");
+            showMessage(
+                "Enter phone number with country code. Example: +919876543210"
+            );
 
             return;
 
         }
+
+        const button = document.getElementById("sendPhoneBtn");
+
+        button.disabled = true;
+
+        button.innerText = "Sending OTP...";
 
         try {
 
@@ -628,7 +670,10 @@
             document.getElementById("phoneOtpSection")
                 .classList.remove("hidden");
 
-            showMessage("Phone OTP sent successfully!", "success");
+            showMessage(
+                "Phone OTP sent successfully!",
+                "success"
+            );
 
         } catch(error) {
 
@@ -641,6 +686,12 @@
                 recaptchaVerifier = null;
 
             }
+
+        } finally {
+
+            button.disabled = false;
+
+            button.innerText = "Send Phone OTP";
 
         }
 
@@ -707,17 +758,18 @@
                 }
             );
 
-            const data = await response.json();
+            const data = await getResponse(response);
 
-            if (!response.ok) {
+            showMessage(
+                data.message || "Login successful.",
+                "success"
+            );
 
-                throw new Error(data.message);
+            if (data.redirect) {
+
+                window.location.href = data.redirect;
 
             }
-
-            showMessage(data.message, "success");
-
-            window.location.href = data.redirect;
 
         } catch(error) {
 
