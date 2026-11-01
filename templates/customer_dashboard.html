@@ -1,37 +1,283 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Dashboard - Suman Store</title>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+<title>Customer Dashboard - Suman Store</title>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+    }
+
+    body {
+        background: #f1f3f6;
+        color: #212121;
+    }
+
+    header {
+        background: #2874f0;
+        color: white;
+        padding: 18px 5%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    header h2 {
+        font-size: 23px;
+    }
+
+    header a {
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .dashboard {
+        max-width: 1100px;
+        margin: 35px auto;
+        padding: 20px;
+    }
+
+    .welcome {
+        background: linear-gradient(120deg, #2874f0, #60a5fa);
+        color: white;
+        padding: 30px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+    }
+
+    .welcome h1 {
+        margin-bottom: 12px;
+    }
+
+    .welcome p {
+        line-height: 1.6;
+    }
+
+    .section-title {
+        font-size: 23px;
+        margin-bottom: 18px;
+    }
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+    }
+
+    .dashboard-card {
+        background: white;
+        padding: 25px 20px;
+        border-radius: 10px;
+        text-decoration: none;
+        color: #212121;
+        border: 1px solid #e5e5e5;
+        transition: 0.2s;
+        display: block;
+    }
+
+    .dashboard-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 5px 15px #ddd;
+        border-color: #2874f0;
+    }
+
+    .card-icon {
+        font-size: 32px;
+        margin-bottom: 15px;
+    }
+
+    .dashboard-card h3 {
+        color: #2874f0;
+        margin-bottom: 9px;
+        font-size: 18px;
+    }
+
+    .dashboard-card p {
+        color: #666;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .bottom-actions {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 30px;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 12px 22px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .shop-btn {
+        background: #2874f0;
+        color: white;
+    }
+
+    .logout-btn {
+        background: #dc3545;
+        color: white;
+    }
+
+    footer {
+        background: #172337;
+        color: white;
+        padding: 25px;
+        text-align: center;
+        margin-top: 40px;
+    }
+
+    footer p {
+        color: #ccc;
+        margin: 8px;
+    }
+
+    @media(max-width: 800px) {
+        .dashboard-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media(max-width: 500px) {
+        .dashboard {
+            margin: 15px auto;
+            padding: 12px;
+        }
+
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .welcome {
+            padding: 22px;
+        }
+
+        .welcome h1 {
+            font-size: 23px;
+        }
+
+        .bottom-actions {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+
 </head>
 
 <body>
 
-    <div class="auth-container">
+<header>
 
-        <h1>Customer Dashboard</h1>
 
-        <p>Welcome to Suman Store!</p>
+<h2>Suman Store</h2>
 
-        <h2>My Account</h2>
+<a href="{{ url_for('home') }}">← Continue Shopping</a>
 
-        <div>
-            <p>🛍️ Shop Products</p>
-            <p>🛒 My Cart</p>
-            <p>📦 My Orders</p>
-            <p>👤 My Profile</p>
-        </div>
 
-        <a href="/">Continue Shopping</a>
+</header>
 
-        <br><br>
+<main class="dashboard">
 
-        <a href="{{ url_for('logout') }}">Logout</a>
 
-    </div>
+<section class="welcome">
+
+    <h1>Welcome to Suman Store!</h1>
+
+    <p>
+        Manage your account, orders, wishlist and saved addresses
+        from your customer dashboard.
+    </p>
+
+</section>
+
+<h2 class="section-title">My Account</h2>
+
+<div class="dashboard-grid">
+
+    <a href="{{ url_for('home') }}" class="dashboard-card">
+        <div class="card-icon">🛍️</div>
+        <h3>Shop Products</h3>
+        <p>Explore products and discover new deals.</p>
+    </a>
+
+    <a href="{{ url_for('cart') }}" class="dashboard-card">
+        <div class="card-icon">🛒</div>
+        <h3>My Cart</h3>
+        <p>View and manage your shopping cart.</p>
+    </a>
+
+    <a href="{{ url_for('my_orders') }}" class="dashboard-card">
+        <div class="card-icon">📦</div>
+        <h3>My Orders</h3>
+        <p>Check your orders and their status.</p>
+    </a>
+
+    <a href="{{ url_for('wishlist') }}" class="dashboard-card">
+        <div class="card-icon">❤️</div>
+        <h3>My Wishlist</h3>
+        <p>View your saved favourite products.</p>
+    </a>
+
+    <a href="{{ url_for('addresses') }}" class="dashboard-card">
+        <div class="card-icon">📍</div>
+        <h3>Saved Addresses</h3>
+        <p>Add, view and manage your delivery addresses.</p>
+    </a>
+
+    <a href="{{ url_for('help_support') }}" class="dashboard-card">
+        <div class="card-icon">🎧</div>
+        <h3>Help & Support</h3>
+        <p>Contact Suman Store for assistance.</p>
+    </a>
+
+</div>
+
+<div class="bottom-actions">
+
+    <a href="{{ url_for('home') }}" class="btn shop-btn">
+        Continue Shopping
+    </a>
+
+    <a href="{{ url_for('logout') }}" class="btn logout-btn">
+        Logout
+    </a>
+
+</div>
+
+</main>
+
+<footer>
+
+<h2>Suman Store</h2>
+
+<p>Your trusted online shopping destination.</p>
+
+<p>© 2026 Suman Store. All Rights Reserved.</p>
+
+
+</footer>
 
 </body>
 </html>

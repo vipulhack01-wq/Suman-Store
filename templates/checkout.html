@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Address - Suman Store</title>
+
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        padding: 20px;
+        background: #f4f6f9;
+        font-family: Arial, sans-serif;
+    }
+
+    .checkout-container {
+        max-width: 1000px;
+        margin: 30px auto;
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
+        gap: 25px;
+    }
+
+    .checkout-box {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 3px 15px rgba(0,0,0,0.07);
+    }
+
+    h1, h2 {
+        margin-top: 0;
+        color: #222;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .full-width {
+        grid-column: 1 / -1;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 7px;
+        font-weight: 600;
+        color: #444;
+    }
+
+    input, textarea, select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 7px;
+        font-size: 15px;
+        outline: none;
+    }
+
+    input:focus, textarea:focus, select:focus {
+        border-color: #2874f0;
+    }
+
+    textarea {
+        resize: vertical;
+        min-height: 80px;
+    }
+
+    .payment-option {
+        padding: 13px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        cursor: pointer;
+    }
+
+    .payment-option input {
+        width: auto;
+        margin-right: 8px;
+    }
+
+    .place-order-btn {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 7px;
+        background: #2874f0;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 15px;
+    }
+
+    .place-order-btn:hover {
+        background: #1558c0;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-bottom: 20px;
+        color: #2874f0;
+        text-decoration: none;
+    }
+
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .total {
+        display: flex;
+        justify-content: space-between;
+        font-size: 20px;
+        font-weight: bold;
+        margin-top: 20px;
+    }
+
+    .empty-message {
+        color: #777;
+        text-align: center;
+        padding: 20px;
+    }
+
+    @media(max-width: 700px) {
+        .checkout-container {
+            grid-template-columns: 1fr;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .full-width {
+            grid-column: auto;
+        }
+    }
+</style>
+
+
+</head>
+
+<body>
+
+<div class="checkout-container">
+
+
+<!-- DELIVERY ADDRESS FORM -->
+<div class="checkout-box">
+
+    <a href="{{ url_for('cart') }}" class="back-link">
+        ← Back to Cart
+    </a>
+
+    <h1>Delivery Address</h1>
+    <p style="color:#777; margin-bottom:25px;">
+        Enter your correct delivery details.
+    </p>
+
+    <form method="POST" action="{{ url_for('checkout') }}">
+
+        <div class="form-grid">
+
+            <div class="form-group full-width">
+                <label>Full Name *</label>
+                <input type="text"
+                       name="full_name"
+                       placeholder="Enter your full name"
+                       maxlength="100"
+                       required>
+            </div>
+
+            <div class="form-group">
+                <label>Mobile Number *</label>
+                <input type="tel"
+                       name="mobile"
+                       placeholder="10-digit mobile number"
+                       pattern="[0-9]{10}"
+                       maxlength="10"
+                       inputmode="numeric"
+                       required>
+            </div>
+
+            <div class="form-group">
+                <label>Email Address *</label>
+                <input type="email"
+                       name="email"
+                       placeholder="Enter email address"
+                       maxlength="120"
+                       required>
+            </div>
+
+            <div class="form-group full-width">
+                <label>House / Flat / Building *</label>
+                <input type="text"
+                       name="house"
+                       placeholder="House number, building name"
+                       maxlength="200"
+                       required>
+            </div>
+
+            <div class="form-group full-width">
+                <label>Locality / Area *</label>
+                <input type="text"
+                       name="locality"
+                       placeholder="Area, street, sector"
+                       maxlength="200"
+                       required>
+            </div>
+
+            <div class="form-group">
+                <label>City *</label>
+                <input type="text"
+                       name="city"
+                       placeholder="City"
+                       maxlength="100"
+                       required>
+            </div>
+
+            <div class="form-group">
+                <label>District *</label>
+                <input type="text"
+                       name="district"
+                       placeholder="District"
+                       maxlength="100"
+                       required>
+            </div>
+
+            <div class="form-group">
+                <label>State *</label>
+                <input type="text"
+                       name="state"
+                       placeholder="State"
+                       maxlength="100"
+                       required>
+            </div>
+
+            <div class="form-group">
+                <label>PIN Code *</label>
+                <input type="text"
+                       name="pincode"
+                       placeholder="6-digit PIN code"
+                       pattern="[0-9]{6}"
+                       maxlength="6"
+                       inputmode="numeric"
+                       required>
+            </div>
+
+            <div class="form-group full-width">
+                <label>Landmark (Optional)</label>
+                <input type="text"
+                       name="landmark"
+                       placeholder="Near school, hospital, etc."
+                       maxlength="200">
+            </div>
+
+            <div class="form-group full-width">
+                <label>Delivery Instructions (Optional)</label>
+                <textarea name="instructions"
+                          maxlength="500"
+                          placeholder="Any special delivery instructions..."></textarea>
+            </div>
+
+        </div>
+
+        <h2 style="margin-top:20px;">Payment Method</h2>
+
+        <label class="payment-option">
+            <input type="radio"
+                   name="payment_method"
+                   value="COD"
+                   required>
+            Cash on Delivery (COD)
+        </label>
+
+        <label class="payment-option">
+            <input type="radio"
+                   name="payment_method"
+                   value="UPI"
+                   required>
+            UPI Payment
+        </label>
+
+        <button type="submit" class="place-order-btn">
+            Place Order
+        </button>
+
+    </form>
+
+</div>
+
+
+<!-- ORDER SUMMARY -->
+<div class="checkout-box">
+
+    <h2>Order Summary</h2>
+
+    {% if cart_items %}
+
+        {% for item in cart_items %}
+
+            <div class="order-item">
+
+                <div>
+                    <strong>{{ item.product.name }}</strong>
+                    <p style="color:#777; margin:5px 0;">
+                        Quantity: {{ item.quantity }}
+                    </p>
+                </div>
+
+                <strong>
+                    ₹{{ "%.2f"|format(item.product.price * item.quantity) }}
+                </strong>
+
+            </div>
+
+        {% endfor %}
+
+        <div class="total">
+            <span>Total</span>
+            <span>₹{{ "%.2f"|format(total) }}</span>
+        </div>
+
+    {% else %}
+
+        <p class="empty-message">
+            Your cart is empty.
+        </p>
+
+    {% endif %}
+
+    <p style="color:#777; font-size:13px; margin-top:20px;">
+        Please verify your address and order details before placing
+        your order.
+    </p>
+
+</div>
+</div>
+</body>
+</html>

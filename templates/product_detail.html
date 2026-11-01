@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+```
+<title>{{ product.name }} - Suman Store</title>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+    }
+
+    body {
+        background: #f5f7fb;
+        color: #222;
+    }
+
+    header {
+        background: #101828;
+        color: white;
+        padding: 18px 7%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .logo {
+        font-size: 25px;
+        font-weight: bold;
+        color: #60a5fa;
+        text-decoration: none;
+    }
+
+    header a {
+        color: white;
+        text-decoration: none;
+        margin-left: 18px;
+    }
+
+    .container {
+        max-width: 1150px;
+        margin: 35px auto;
+        padding: 0 18px;
+    }
+
+    .breadcrumb {
+        margin-bottom: 22px;
+        color: #666;
+        font-size: 14px;
+    }
+
+    .breadcrumb a {
+        color: #2563eb;
+        text-decoration: none;
+    }
+
+    .product-card {
+        background: white;
+        border-radius: 15px;
+        padding: 28px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 35px;
+        box-shadow: 0 5px 25px rgba(0,0,0,0.06);
+    }
+
+    .main-image {
+        width: 100%;
+        height: 400px;
+        object-fit: contain;
+        background: #f8fafc;
+        border-radius: 12px;
+    }
+
+    .gallery {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 15px;
+    }
+
+    .gallery img {
+        width: 75px;
+        height: 75px;
+        object-fit: contain;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        padding: 4px;
+        cursor: pointer;
+        background: white;
+    }
+
+    .gallery img:hover {
+        border-color: #2563eb;
+    }
+
+    .product-info h1 {
+        font-size: 28px;
+        margin-bottom: 15px;
+    }
+
+    .rating {
+        color: #f59e0b;
+        margin-bottom: 18px;
+        font-size: 16px;
+    }
+
+    .price {
+        font-size: 30px;
+        font-weight: bold;
+        color: #15803d;
+        margin: 18px 0;
+    }
+
+    .stock {
+        margin: 15px 0;
+        font-weight: bold;
+    }
+
+    .available {
+        color: #15803d;
+    }
+
+    .unavailable {
+        color: #dc2626;
+    }
+
+    .description {
+        line-height: 1.7;
+        color: #555;
+        margin-top: 20px;
+        white-space: pre-line;
+    }
+
+    .seller-info {
+        margin-top: 20px;
+        padding: 13px;
+        background: #f1f5f9;
+        border-radius: 8px;
+        color: #555;
+    }
+
+    .purchase-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 20px;
+    }
+
+    .purchase-buttons form {
+        width: 100%;
+        margin: 0;
+    }
+
+    .btn {
+        display: block;
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 9px;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+    }
+
+    .cart-btn {
+        background: #2563eb;
+    }
+
+    .cart-btn:hover {
+        background: #1d4ed8;
+    }
+
+    .buy-btn {
+        background: #f97316;
+    }
+
+    .buy-btn:hover {
+        background: #ea580c;
+    }
+
+    .wishlist-btn {
+        background: #fff1f2;
+        color: #dc2626;
+        border: 1px solid #fecdd3;
+    }
+
+    .wishlist-btn:hover {
+        background: #ffe4e6;
+    }
+
+    .login-btn {
+        background: #2563eb;
+        margin-top: 20px;
+    }
+
+    .btn:disabled {
+        background: #999;
+        cursor: not-allowed;
+    }
+
+    .section {
+        background: white;
+        padding: 25px;
+        margin-top: 25px;
+        border-radius: 13px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.04);
+    }
+
+    .section h2 {
+        margin-bottom: 18px;
+        font-size: 23px;
+    }
+
+    .specifications {
+        white-space: pre-line;
+        line-height: 1.8;
+        color: #555;
+    }
+
+    .product-video {
+        width: 100%;
+        max-height: 450px;
+        background: black;
+        border-radius: 10px;
+    }
+
+    .review {
+        border-bottom: 1px solid #eee;
+        padding: 18px 0;
+    }
+
+    .review:last-child {
+        border-bottom: none;
+    }
+
+    .review-name {
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+
+    .review-rating {
+        color: #f59e0b;
+        margin-bottom: 8px;
+    }
+
+    .review-comment {
+        color: #555;
+        line-height: 1.6;
+        white-space: pre-line;
+    }
+
+    .review-media {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 12px;
+    }
+
+    .review-media img {
+        width: 110px;
+        height: 110px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .review-media video {
+        width: 200px;
+        max-height: 150px;
+        border-radius: 8px;
+    }
+
+    label {
+        display: block;
+        margin: 15px 0 7px;
+        font-weight: bold;
+    }
+
+    input, textarea, select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 15px;
+    }
+
+    textarea {
+        min-height: 110px;
+        resize: vertical;
+    }
+
+    .flash {
+        padding: 12px;
+        margin-bottom: 15px;
+        background: #dcfce7;
+        color: #166534;
+        border-radius: 8px;
+    }
+
+    footer {
+        text-align: center;
+        padding: 25px;
+        margin-top: 40px;
+        background: #101828;
+        color: white;
+    }
+
+    @media(max-width: 750px) {
+        .product-card {
+            grid-template-columns: 1fr;
+            padding: 18px;
+        }
+
+        .main-image {
+            height: 300px;
+        }
+
+        .product-info h1 {
+            font-size: 23px;
+        }
+
+        header {
+            padding: 17px;
+        }
+
+        header nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        header a {
+            margin-left: 0;
+        }
+    }
+</style>
+```
+
+</head>
+
+<body>
+
+<header>
+
+```
+<a href="{{ url_for('home') }}" class="logo">
+    Suman Store
+</a>
+
+<nav>
+    <a href="{{ url_for('home') }}">Home</a>
+
+    <a href="{{ url_for('cart') if current_user.is_authenticated and current_user.role == 'customer' else url_for('login') }}">
+        Cart
+    </a>
+
+    <a href="{{ url_for('wishlist') if current_user.is_authenticated and current_user.role == 'customer' else url_for('login') }}">
+        Wishlist
+    </a>
+
+    <a href="{{ url_for('dashboard') if current_user.is_authenticated else url_for('login') }}">
+        Account
+    </a>
+</nav>
+```
+
+</header>
+
+<div class="container">
+
+```
+<div class="breadcrumb">
+    <a href="{{ url_for('home') }}">Home</a>
+    / {{ product.name }}
+</div>
+
+
+{% with messages = get_flashed_messages() %}
+    {% for message in messages %}
+        <div class="flash">{{ message }}</div>
+    {% endfor %}
+{% endwith %}
+
+
+<!-- PRODUCT OVERVIEW -->
+
+<div class="product-card">
+
+    <div>
+
+        {% if product.image %}
+
+            <img
+                id="mainImage"
+                class="main-image"
+                src="{{ url_for('static', filename='uploads/' ~ product.image) }}"
+                alt="{{ product.name }}"
+                onerror="this.onerror=null; this.src='https://placehold.co/400x400?text=Image+Not+Found';"
+            >
+
+        {% else %}
+
+            <div class="main-image"
+                 style="display:flex;align-items:center;justify-content:center;color:#888;">
+                No Product Image
+            </div>
+
+        {% endif %}
+
+
+        <!-- PRODUCT IMAGE GALLERY -->
+
+        <div class="gallery">
+
+            {% if product.image %}
+
+                <img
+                    src="{{ url_for('static', filename='uploads/' ~ product.image) }}"
+                    onclick="changeImage(this.src)"
+                    alt="Product image"
+                    onerror="this.style.display='none';"
+                >
+
+            {% endif %}
+
+
+            {% for image in product.images %}
+
+                {% if image.filename != product.image %}
+
+                    <img
+                        src="{{ url_for('static', filename='uploads/' ~ image.filename) }}"
+                        onclick="changeImage(this.src)"
+                        alt="Product image"
+                        onerror="this.style.display='none';"
+                    >
+
+                {% endif %}
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+
+    <!-- PRODUCT INFORMATION -->
+
+    <div class="product-info">
+
+        <h1>{{ product.name }}</h1>
+
+
+        <!-- PRODUCT RATING -->
+
+        <div class="rating">
+
+            {% for i in range(1, 6) %}
+
+                {% if i <= average_rating|round(0, 'floor') %}
+                    ★
+                {% else %}
+                    ☆
+                {% endif %}
+
+            {% endfor %}
+
+            {{ average_rating }}/5
+            ({{ reviews|length }} Reviews)
+
+        </div>
+
+
+        <!-- PRODUCT PRICE -->
+
+        <div class="price">
+            ₹{{ "%.2f"|format(product.price) }}
+        </div>
+
+
+        <!-- STOCK STATUS -->
+
+        <div class="stock">
+
+            {% if product.stock > 0 %}
+
+                <span class="available">
+                    In Stock ({{ product.stock }} available)
+                </span>
+
+            {% else %}
+
+                <span class="unavailable">
+                    Out of Stock
+                </span>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- DESCRIPTION -->
+
+        <div class="description">
+            {{ product.description }}
+        </div>
+
+
+        <div class="seller-info">
+            <strong>Product ID:</strong> #{{ product.id }}
+        </div>
+
+
+        <!-- CUSTOMER PURCHASE BUTTONS -->
+
+        {% if current_user.is_authenticated and current_user.role == 'customer' %}
+
+            <div class="purchase-buttons">
+
+                <form
+                    action="{{ url_for('add_to_cart', product_id=product.id) }}"
+                    method="POST"
+                >
+
+                    <button
+                        class="btn cart-btn"
+                        type="submit"
+                        {% if product.stock < 1 %}disabled{% endif %}
+                    >
+                        Add to Cart
+                    </button>
+
+                </form>
+
+
+                <form
+                    action="{{ url_for('buy_now', product_id=product.id) }}"
+                    method="POST"
+                >
+
+                    <button
+                        class="btn buy-btn"
+                        type="submit"
+                        {% if product.stock < 1 %}disabled{% endif %}
+                    >
+                        Buy Now
+                    </button>
+
+                </form>
+
+
+                <form
+                    action="{{ url_for('add_to_wishlist', product_id=product.id) }}"
+                    method="POST"
+                >
+
+                    <button class="btn wishlist-btn" type="submit">
+                        ♡ Add to Wishlist
+                    </button>
+
+                </form>
+
+            </div>
+
+        {% elif not current_user.is_authenticated %}
+
+            <a class="btn login-btn" href="{{ url_for('login') }}">
+                Login to Purchase
+            </a>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- PRODUCT SPECIFICATIONS -->
+
+{% if product.specifications %}
+
+    <div class="section">
+
+        <h2>Product Specifications</h2>
+
+        <div class="specifications">
+            {{ product.specifications }}
+        </div>
+
+    </div>
+
+{% endif %}
+
+
+<!-- PRODUCT VIDEO -->
+
+{% if product.video %}
+
+    <div class="section">
+
+        <h2>Product Video</h2>
+
+        <video class="product-video" controls preload="metadata">
+
+            <source
+                src="{{ url_for('static', filename='uploads/videos/' ~ product.video) }}"
+                type="video/mp4"
+            >
+
+            Your browser does not support video playback.
+
+        </video>
+
+    </div>
+
+{% endif %}
+
+
+<!-- CUSTOMER REVIEWS -->
+
+<div class="section">
+
+    <h2>Customer Reviews</h2>
+
+    {% if reviews %}
+
+        {% for review in reviews %}
+
+            <div class="review">
+
+                <div class="review-name">
+                    {{ review.customer.name }}
+                </div>
+
+
+                <div class="review-rating">
+
+                    {% for i in range(1, 6) %}
+
+                        {% if i <= review.rating %}
+                            ★
+                        {% else %}
+                            ☆
+                        {% endif %}
+
+                    {% endfor %}
+
+                </div>
+
+
+                <div class="review-comment">
+                    {{ review.comment or "No written comment." }}
+                </div>
+
+
+                {% if review.media %}
+
+                    <div class="review-media">
+
+                        {% for media in review.media %}
+
+                            {% if media.media_type == "image" %}
+
+                                <img
+                                    src="{{ url_for('static', filename='uploads/reviews/' ~ media.filename) }}"
+                                    alt="Customer review image"
+                                >
+
+                            {% elif media.media_type == "video" %}
+
+                                <video controls>
+
+                                    <source
+                                        src="{{ url_for('static', filename='uploads/reviews/' ~ media.filename) }}"
+                                    >
+
+                                </video>
+
+                            {% endif %}
+
+                        {% endfor %}
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p style="color:#777;">
+            No reviews yet. Be the first to share your experience after a delivered purchase.
+        </p>
+
+    {% endif %}
+
+</div>
+
+
+<!-- ADD REVIEW -->
+
+{% if current_user.is_authenticated and current_user.role == 'customer' %}
+
+    <div class="section">
+
+        <h2>Write a Review</h2>
+
+        <p style="color:#777;font-size:14px;">
+
+            Only customers who have received this product can submit a review.
+            Reviews appear after admin approval.
+
+        </p>
+
+
+        <form
+            action="{{ url_for('add_review', product_id=product.id) }}"
+            method="POST"
+            enctype="multipart/form-data"
+        >
+
+            <label>Your Rating</label>
+
+            <select name="rating" required>
+
+                <option value="">Select Rating</option>
+                <option value="5">★★★★★ - Excellent</option>
+                <option value="4">★★★★ - Very Good</option>
+                <option value="3">★★★ - Good</option>
+                <option value="2">★★ - Average</option>
+                <option value="1">★ - Poor</option>
+
+            </select>
+
+
+            <label>Your Review</label>
+
+            <textarea
+                name="comment"
+                placeholder="Write your product experience..."
+            ></textarea>
+
+
+            <label>Upload Photos / Videos (Maximum 3)</label>
+
+            <input
+                type="file"
+                name="media"
+                accept="image/png,image/jpeg,image/webp,video/mp4,video/webm"
+                multiple
+            >
+
+
+            <button type="submit" class="btn cart-btn">
+                Submit Review
+            </button>
+
+        </form>
+
+    </div>
+
+{% endif %}
+```
+
+</div>
+
+<footer>
+    © 2026 Suman Store. All Rights Reserved.
+</footer>
+
+<script>
+
+    function changeImage(imageUrl) {
+
+        const mainImage = document.getElementById("mainImage");
+
+        if (mainImage) {
+            mainImage.src = imageUrl;
+        }
+
+    }
+
+</script>
+
+</body>
+</html>

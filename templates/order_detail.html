@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details - Suman Store</title>
+
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        padding: 20px;
+        background: #f4f6f9;
+        font-family: Arial, sans-serif;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: 30px auto;
+    }
+
+    .card {
+        background: white;
+        padding: 25px;
+        margin-bottom: 20px;
+        border-radius: 12px;
+        box-shadow: 0 3px 15px rgba(0,0,0,0.06);
+    }
+
+    h1, h2 {
+        margin-top: 0;
+        color: #222;
+    }
+
+    .row {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 12px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .label {
+        color: #777;
+    }
+
+    .value {
+        font-weight: 600;
+        text-align: right;
+    }
+
+    .amount {
+        font-size: 25px;
+        color: #2874f0;
+        font-weight: bold;
+    }
+
+    .status {
+        display: inline-block;
+        padding: 7px 13px;
+        border-radius: 20px;
+        background: #fff3cd;
+        color: #856404;
+        font-weight: bold;
+    }
+
+    .verified {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .rejected {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .payment-box {
+        background: #f8faff;
+        border: 1px solid #dce6fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 15px;
+    }
+
+    .upi-id {
+        background: white;
+        padding: 13px;
+        border: 1px dashed #2874f0;
+        border-radius: 7px;
+        font-weight: bold;
+        overflow-wrap: anywhere;
+        margin: 12px 0;
+    }
+
+    input {
+        width: 100%;
+        padding: 13px;
+        border: 1px solid #ddd;
+        border-radius: 7px;
+        margin: 10px 0;
+        font-size: 15px;
+    }
+
+    button {
+        padding: 13px 20px;
+        border: none;
+        border-radius: 7px;
+        background: #2874f0;
+        color: white;
+        font-size: 15px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #1558c0;
+    }
+
+    .back {
+        display: inline-block;
+        margin-bottom: 20px;
+        color: #2874f0;
+        text-decoration: none;
+    }
+
+    .item {
+        padding: 12px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .note {
+        color: #777;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    @media(max-width: 600px) {
+        .row {
+            flex-direction: column;
+        }
+
+        .value {
+            text-align: left;
+        }
+    }
+</style>
+
+
+</head>
+
+<body>
+
+<div class="container">
+
+
+<a href="{{ url_for('my_orders') }}" class="back">
+    ← My Orders
+</a>
+
+<div class="card">
+
+    <h1>Order Details</h1>
+
+    <div class="row">
+        <span class="label">Order Number</span>
+        <span class="value">{{ order.order_number }}</span>
+    </div>
+
+    <div class="row">
+        <span class="label">Order Date</span>
+        <span class="value">{{ order.created_at.strftime('%d-%m-%Y %I:%M %p') }}</span>
+    </div>
+
+    <div class="row">
+        <span class="label">Order Status</span>
+        <span class="value">{{ order.order_status }}</span>
+    </div>
+
+    <div class="row">
+        <span class="label">Payment Method</span>
+        <span class="value">{{ order.payment_method }}</span>
+    </div>
+
+    <div class="row">
+        <span class="label">Payment Status</span>
+        <span class="value">
+            {% if order.payment_status == "Verified" %}
+                <span class="status verified">Verified</span>
+            {% elif order.payment_status == "Rejected" %}
+                <span class="status rejected">Rejected</span>
+            {% else %}
+                <span class="status">{{ order.payment_status }}</span>
+            {% endif %}
+        </span>
+    </div>
+
+    <div class="row">
+        <span class="label">Total Amount</span>
+        <span class="amount">₹{{ "%.2f"|format(order.total_amount) }}</span>
+    </div>
+
+</div>
+
+
+<!-- DELIVERY ADDRESS -->
+
+<div class="card">
+
+    <h2>Delivery Address</h2>
+
+    <p><strong>{{ order.full_name }}</strong></p>
+    <p>{{ order.house }}, {{ order.locality }}</p>
+    <p>{{ order.landmark or '' }}</p>
+    <p>{{ order.city }}, {{ order.district }}</p>
+    <p>{{ order.state }} - {{ order.pincode }}</p>
+    <p>Mobile: {{ order.mobile }}</p>
+    <p>Email: {{ order.email }}</p>
+
+    {% if order.instructions %}
+        <p>Instructions: {{ order.instructions }}</p>
+    {% endif %}
+
+</div>
+
+
+<!-- ORDER ITEMS -->
+
+<div class="card">
+
+    <h2>Ordered Products</h2>
+
+    {% for item in order.items %}
+
+        <div class="item">
+
+            <strong>{{ item.product_name }}</strong>
+
+            <div class="row">
+                <span class="label">
+                    ₹{{ "%.2f"|format(item.price) }} × {{ item.quantity }}
+                </span>
+
+                <strong>
+                    ₹{{ "%.2f"|format(item.price * item.quantity) }}
+                </strong>
+            </div>
+
+        </div>
+
+    {% endfor %}
+
+</div>
+
+
+<!-- UPI PAYMENT -->
+
+{% if order.payment_method == "UPI" %}
+
+    <div class="card">
+
+        <h2>UPI Payment</h2>
+
+        {% if order.payment_status != "Verified" %}
+
+            <div class="payment-box">
+
+                <h3>Pay ₹{{ "%.2f"|format(order.total_amount) }}</h3>
+
+                {% if upi_id %}
+
+                    <p>Pay using this UPI ID:</p>
+
+                    <div class="upi-id" id="storeUpi">
+                        {{ upi_id }}
+                    </div>
+
+                    <button type="button" onclick="copyUPI()">
+                        Copy UPI ID
+                    </button>
+
+                    <p style="margin-top:15px;">
+                        <a href="upi://pay?pa={{ upi_id|urlencode }}&pn=Suman%20Store&am={{ '%.2f'|format(order.total_amount) }}&cu=INR">
+                            Open UPI App
+                        </a>
+                    </p>
+
+                {% else %}
+
+                    <p style="color:#b02a37;">
+                        UPI ID is not configured yet.
+                    </p>
+
+                {% endif %}
+
+                <hr style="margin:20px 0;">
+
+                {% if order.payment_status != "Verification Pending" %}
+
+                    <h3>Submit Transaction Reference</h3>
+
+                    <form method="POST"
+                          action="{{ url_for('submit_utr', order_id=order.id) }}">
+
+                        <label>UTR / Transaction Reference Number</label>
+
+                        <input type="text"
+                               name="utr_number"
+                               minlength="8"
+                               maxlength="100"
+                               placeholder="Enter transaction reference"
+                               required>
+
+                        <button type="submit">
+                            Submit Payment Details
+                        </button>
+
+                    </form>
+
+                {% else %}
+
+                    <p class="status">
+                        Your payment is waiting for verification.
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+            <p class="note">
+                Submit your UTR only after completing the actual payment.
+                Admin will verify the transaction before marking payment
+                as successful. Never share your UPI PIN or OTP.
+            </p>
+
+        {% else %}
+
+            <p class="status verified">
+                Payment Successfully Verified
+            </p>
+
+        {% endif %}
+
+    </div>
+
+{% else %}
+
+    <div class="card">
+
+        <h2>Cash on Delivery</h2>
+
+        <p>Your payment will be collected at delivery.</p>
+
+    </div>
+
+{% endif %}
+
+
+</div>
+
+<script>
+function copyUPI() {
+    const upi = document.getElementById("storeUpi").innerText.trim();
+
+    navigator.clipboard.writeText(upi)
+        .then(() => alert("UPI ID copied successfully!"))
+        .catch(() => alert("Could not copy UPI ID."));
+}
+</script>
+
+</body>
+</html>

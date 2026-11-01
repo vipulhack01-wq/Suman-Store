@@ -1,50 +1,364 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Cart - Suman Store</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+
+<title>My Cart - Suman Store</title>
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}">
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        background: #f1f3f6;
+        font-family: Arial, sans-serif;
+    }
+
+    .cart-container {
+        max-width: 1150px;
+        margin: 30px auto;
+        padding: 15px;
+    }
+
+    .cart-layout {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 20px;
+        align-items: start;
+    }
+
+    .cart-box, .price-box {
+        background: white;
+        border-radius: 7px;
+        padding: 22px;
+    }
+
+    .cart-heading {
+        font-size: 23px;
+        margin: 0 0 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .cart-item {
+        display: flex;
+        gap: 20px;
+        padding: 22px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .cart-image {
+        width: 130px;
+        height: 130px;
+        object-fit: contain;
+        background: #f8f8f8;
+        border-radius: 6px;
+    }
+
+    .cart-info {
+        flex: 1;
+    }
+
+    .cart-info h3 {
+        margin: 0 0 10px;
+        font-size: 18px;
+    }
+
+    .cart-info h3 a {
+        color: #212121;
+        text-decoration: none;
+    }
+
+    .cart-price {
+        color: #2874f0;
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 15px;
+    }
+
+    .quantity-form {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+
+    .quantity-form input {
+        width: 65px;
+        padding: 9px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        text-align: center;
+    }
+
+    .quantity-form button,
+    .action-btn {
+        border: none;
+        padding: 9px 14px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+    }
+
+    .update-btn {
+        background: #2874f0;
+        color: white;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .action-buttons form {
+        margin: 0;
+    }
+
+    .remove-btn {
+        background: #fff0f0;
+        color: #d32f2f;
+    }
+
+    .wishlist-btn {
+        background: #f1f3f6;
+        color: #2874f0;
+    }
+
+    .price-box h3 {
+        margin-top: 0;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .price-row {
+        display: flex;
+        justify-content: space-between;
+        margin: 18px 0;
+        color: #555;
+    }
+
+    .total-row {
+        border-top: 1px dashed #ccc;
+        padding-top: 17px;
+        font-weight: bold;
+        font-size: 18px;
+        color: #212121;
+    }
+
+    .checkout-btn {
+        display: block;
+        width: 100%;
+        background: #fb641b;
+        color: white;
+        text-align: center;
+        padding: 14px;
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: bold;
+        margin-top: 20px;
+    }
+
+    .empty-cart {
+        text-align: center;
+        padding: 55px 15px;
+    }
+
+    .empty-cart h2 {
+        color: #212121;
+    }
+
+    .empty-cart p {
+        color: #777;
+    }
+
+    .shop-btn {
+        display: inline-block;
+        background: #2874f0;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 4px;
+        text-decoration: none;
+        margin-top: 12px;
+    }
+
+    @media (max-width: 750px) {
+        .cart-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .cart-item {
+            gap: 12px;
+        }
+
+        .cart-image {
+            width: 95px;
+            height: 95px;
+        }
+
+        .cart-info h3 {
+            font-size: 15px;
+        }
+
+        .cart-price {
+            font-size: 17px;
+        }
+    }
+</style>
+
 </head>
+
 <body>
 
-<div class="auth-container">
+<div class="cart-container">
 
-    <h1>My Shopping Cart</h1>
+{% if cart_items %}
 
-    {% for item in cart_items %}
+<div class="cart-layout">
 
-        <div class="product-card">
+    <!-- CART PRODUCTS -->
+    <div class="cart-box">
 
-            <h3>{{ item.product.name }}</h3>
+        <h2 class="cart-heading">
+            My Shopping Cart ({{ cart_items|length }})
+        </h2>
 
-            <p>Price: ₹{{ item.product.price }}</p>
+        {% for item in cart_items %}
 
-            <p>Quantity: {{ item.quantity }}</p>
+        <div class="cart-item">
 
-            <p>
-                Subtotal:
-                ₹{{ item.product.price * item.quantity }}
-            </p>
+            <a href="{{ url_for('product_detail', product_id=item.product.id) }}">
 
-            <form method="POST"
-                  action="{{ url_for('remove_from_cart', item_id=item.id) }}">
+                <!-- FIXED PRODUCT IMAGE PATH -->
+                <img
+                    class="cart-image"
+                    src="{{ url_for('static', filename='uploads/' ~ item.product.image) }}"
+                    alt="{{ item.product.name }}"
+                    onerror="this.onerror=null; this.src='https://placehold.co/150x150?text=Image+Not+Found';"
+                >
 
-                <button type="submit">Remove</button>
+            </a>
 
-            </form>
+            <div class="cart-info">
+
+                <h3>
+                    <a href="{{ url_for('product_detail', product_id=item.product.id) }}">
+                        {{ item.product.name }}
+                    </a>
+                </h3>
+
+                <div class="cart-price">
+                    ₹{{ "%.2f"|format(item.product.price) }}
+                </div>
+
+                <!-- QUANTITY UPDATE -->
+                <form class="quantity-form"
+                      method="POST"
+                      action="{{ url_for('update_cart', item_id=item.id) }}">
+
+                    <label>Qty:</label>
+
+                    <input
+                        type="number"
+                        name="quantity"
+                        value="{{ item.quantity }}"
+                        min="1"
+                        max="{{ item.product.stock }}"
+                        required
+                    >
+
+                    <button type="submit" class="update-btn">
+                        Update
+                    </button>
+
+                </form>
+
+                <div class="action-buttons">
+
+                    <!-- SAVE FOR LATER -->
+                    <form method="POST"
+                          action="{{ url_for('save_for_later', item_id=item.id) }}">
+
+                        <button type="submit" class="action-btn wishlist-btn">
+                            Save for Later
+                        </button>
+
+                    </form>
+
+                    <!-- REMOVE -->
+                    <form method="POST"
+                          action="{{ url_for('remove_from_cart', item_id=item.id) }}">
+
+                        <button type="submit" class="action-btn remove-btn">
+                            Remove
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
 
         </div>
 
-    {% else %}
+        {% endfor %}
 
-        <p>Your cart is empty!</p>
+    </div>
 
-    {% endfor %}
+    <!-- PRICE DETAILS -->
+    <div class="price-box">
 
-    <h2>Total: ₹{{ total }}</h2>
+        <h3>PRICE DETAILS</h3>
 
-    <a href="/">Continue Shopping</a>
+        <div class="price-row">
+            <span>Items ({{ cart_items|length }})</span>
+            <span>₹{{ "%.2f"|format(total) }}</span>
+        </div>
+
+        <div class="price-row">
+            <span>Delivery Charges</span>
+            <span style="color: green;">FREE</span>
+        </div>
+
+        <div class="price-row total-row">
+            <span>Total Amount</span>
+            <span>₹{{ "%.2f"|format(total) }}</span>
+        </div>
+
+        <a href="{{ url_for('checkout') }}" class="checkout-btn">
+            PLACE ORDER
+        </a>
+
+    </div>
+
+</div>
+
+{% else %}
+
+<div class="cart-box empty-cart">
+
+    <h2>Your Cart is Empty!</h2>
+
+    <p>Add some products to your shopping cart.</p>
+
+    <a href="{{ url_for('home') }}" class="shop-btn">
+        Continue Shopping
+    </a>
+
+</div>
+
+{% endif %}
+
 
 </div>
 

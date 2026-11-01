@@ -3,45 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Add Product - Suman Store</title>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .upload-form {
+            max-width: 650px;
+            margin: 30px auto;
+            padding: 25px;
+            background: white;
+            border-radius: 12px;
+        }
+
+        .upload-form input,
+        .upload-form textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0 18px;
+            box-sizing: border-box;
+        }
+
+        .upload-form label {
+            display: block;
+            font-weight: bold;
+        }
+
+        .upload-form textarea {
+            min-height: 100px;
+        }
+
+        .upload-form button {
+            width: 100%;
+            padding: 14px;
+            cursor: pointer;
+        }
+
+        .upload-note {
+            font-size: 13px;
+            color: #666;
+            margin-top: -12px;
+        }
+    </style>
 </head>
+
 <body>
 
-    <div class="auth-container">
+<div class="auth-container">
 
-        <h1>Add New Product</h1>
-        <p>List your product on Suman Store</p>
+    <h1>Add New Product</h1>
 
-        <form method="POST" enctype="multipart/form-data">
+    <p>List your product on Suman Store</p>
 
-            <input type="text" name="name"
-                   placeholder="Product Name" required>
+    <form class="upload-form"
+          method="POST"
+          enctype="multipart/form-data">
 
-            <textarea name="description"
-                      placeholder="Product Description"
-                      required></textarea>
+        <label>Product Name *</label>
 
-            <input type="number" name="price"
-                   placeholder="Product Price (₹)"
-                   min="1" step="0.01" required>
+        <input
+            type="text"
+            name="name"
+            placeholder="Enter product name"
+            maxlength="150"
+            required
+        >
 
-            <input type="number" name="stock"
-                   placeholder="Available Stock"
-                   min="0" required>
+        <label>Product Description *</label>
 
-            <input type="file" name="image"
-                   accept="image/png,image/jpeg,image/webp">
+        <textarea
+            name="description"
+            placeholder="Describe your product"
+            required
+        ></textarea>
 
-            <button type="submit">Submit Product</button>
+        <label>Product Specifications</label>
 
-        </form>
+        <textarea
+            name="specifications"
+            placeholder="Brand, colour, size, material, model etc."
+        ></textarea>
 
-        <br>
-        <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+        <label>Product Price (₹) *</label>
 
-    </div>
+        <input
+            type="number"
+            name="price"
+            placeholder="Enter price"
+            min="0.01"
+            step="0.01"
+            required
+        >
+
+        <label>Available Stock *</label>
+
+        <input
+            type="number"
+            name="stock"
+            placeholder="Enter available quantity"
+            min="0"
+            required
+        >
+
+        <label>Product Photos</label>
+
+        <input
+            type="file"
+            name="images"
+            accept="image/png,image/jpeg,image/webp"
+            multiple
+        >
+
+        <p class="upload-note">
+            PNG, JPG, JPEG and WEBP formats.
+        </p>
+
+        <label>Product Video</label>
+
+        <input
+            type="file"
+            name="video"
+            accept="video/mp4,video/webm"
+        >
+
+        <p class="upload-note">
+            MP4 and WEBM formats only. Server upload limit will apply.
+        </p>
+
+        <button type="submit">
+            Submit Product for Approval
+        </button>
+
+    </form>
+
+    <a href="{{ url_for('dashboard') }}">
+        Back to Dashboard
+    </a>
+
+</div>
 
 </body>
 </html>
